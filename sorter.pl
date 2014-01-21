@@ -1,24 +1,34 @@
-﻿#!/usr/bin/env perl
+﻿#!/usr/bin/perl
 
 use Getopt::Std;
 
-$base_dir = chroot("/usr/ftp"); # корневая папка FTP
-$logfile = "/var/log/sorter.log"; # $logfile - имя файла, в который ведется логирование
+%files = (
+	ftp_root => "/usr/ftp", # корневая папка FTP
+	logfile => "/var/log/sorter.log", # $logfile - имя файла, в который ведется логирование
+	)
 @icao = (); # список папок с названиями ИКАО, имеющихся в корне ftp
+
+# Перемещаемся в папку FTP и открываем лог
+chdir "$files{$ftp_root}";
+open LOGFILE ">>" $files{$logfile};
 
 # Проверяем, указан ли флаг первичного запуска.
 getopt('n');
 unless ($opt_n == 0) {
 	# Если указан, считываем список папок, являющихся кодом ИКАО, в массив @icao
-	@icao = chomp( opendir ICAO_DIR, );
-	foreach (@icao) {
+	foreach (chomp @icao = <./[A-Za-z][A-Za-z][A-Za-z][A-Za-z]> ) {
 		# заходим в папки с ИКАО, проверяем наличие подпапок с годами.
-		( opendir CUR_DIR, "$base_dir/$_" or die $! ) if -d CUR_DIR;
-		# Если такие подпапки есть, проверяем наличие в папке с ИКАО файлов,
-		# не лежащих в подпапках по годам. При отсутствии таких файлов пишем об этом в лог.
-		unless ( glob "./*.")
-		# Затем продолжаем выполнение.
-		closedir($cur_dir);
+		opendir ICAO_DIR, $_;
+		while (my $content = readdir ICAO_DIR) {
+			# Если такие подпапки есть
+			my $with_year = 1 if $content =~ /^\d{4}$/;
+			# проверяем наличие в папке с ИКАО файлов, не лежащих в подпапках по годам.
+			my $naked_files = 1 unless $content =~ [1-2]\d{3}[0-1]\d[0-3]\d\.[0-2]\d[0-6]\d[0-6]\d\.[a-z]{4}\.20(1|2)\.\w+\.(lccs.xz|lkks);
+			# При отсутствии таких файлов пишем об этом в лог
+			printf LOGFILE "Каталог ICAO_DIR оказался пуст при наличии подкаталогов по годам\n" if ($with_year + $naked_files) == 2;
+		}
+		# Затем продолжаем перебирать папки
+		closedir ICAO_DIR;
 	}
 }
 
