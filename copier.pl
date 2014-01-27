@@ -1,9 +1,10 @@
-﻿#!/usr/bin/perl
+#!/usr/bin/perl
 
+use 5.010;
 use File::Find;
-use File::Path;
+use File::Path qw(make_path);
 
-$ftp_dir = "/var/log";
+$ftp_dir = "/mnt/ftp/";
 $home_dir = "/root/ftp_mirror/";
 
 find ( \&copier, $ftp_dir );
@@ -12,7 +13,7 @@ sub copier {
 	$inbox_dir = "$home_dir";
 
 	# Проверить, что имя файла совпадает с шаблоном. Если да,
-	if ( /[1-2]\d{3}[0-1]\d[0-3]\d\.[0-2]\d[0-6]\d[0-6]\d\.[a-z]{4})\.20(1|2)\.\w+\.(lccs.xz|lkks)/ ) {
+	if ( /(.*\.?)+/ ) {
 		# Получаем список каталогов.
 		@dirs = split (/\//, $File::Find::dir);
 		shift @dirs;
@@ -23,9 +24,17 @@ sub copier {
 		}
 
 		# Если каталога нет, создать его и продолжить проверять наличие каталогов на FTP
-		mkpath $inbox_dir unless ( -d $inbox_dir ) ; 
-
+		if ( -d $File::Find::name ) {
+			say "BRO, $File::Find::name";
+			$inbox_dir = $home_dir . $File::Find::name;
+			unless ( -d $inbox_dir ) {
+				make_path $inbox_dir || die "Scum $inbox_dir: $!\n" ;
+			}
+		} else {
 		# Затем создать файл с таким же именем локально.
-		open NEWF, ">>", ("$inbox_dir"."$_");
+		say "INBOX $inbox_dir";
+		say $_;
+		open NEWF, ">>", ($inbox_dir . $_);
+		}
 	}
 }
