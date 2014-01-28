@@ -13,9 +13,11 @@ sub copier {
 	$inbox_dir = "$home_dir";
 
 	# Проверить, что имя файла совпадает с шаблоном. Если да,
-	if ( /(.*\.?)+/ ) {
+	if ( /.*+/ ) {
 		# Получаем список каталогов.
 		@dirs = split (/\//, $File::Find::dir);
+		# Количество сдвигов можно увеличить, чтобы не копировать лишние папки.
+		# Плюс 1 сдвиг нужен всегда для первого пустого значения в списке.
 		shift @dirs;
 
 		# Создаем переменную с каталогом-целью.
@@ -25,14 +27,12 @@ sub copier {
 
 		# Если каталога нет, создать его и продолжить проверять наличие каталогов на FTP
 		if ( -d $File::Find::name ) {
-			say "BRO, $File::Find::name";
 			$inbox_dir = $home_dir . $File::Find::name;
 			unless ( -d $inbox_dir ) {
 				make_path $inbox_dir || die "Scum $inbox_dir: $!\n" ;
 			}
 		} else {
 		# Затем создать файл с таким же именем локально.
-		say "INBOX $inbox_dir";
 		say $_;
 		open NEWF, ">>", ($inbox_dir . $_);
 		}
