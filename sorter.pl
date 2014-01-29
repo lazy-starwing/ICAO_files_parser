@@ -19,7 +19,18 @@ finddepth ( \&dig, $ftp_root );
 
 sub dig {
 	if ( /(?:20)?([0-9][0-9][0-1][0-9][0-3][0-9]\.[0-2][0-9][0-6][0-9][0-6][0-9]\.(?:([A-Z]{4}|CCC)\.(20)?(1|2)\.\w+\.|\w+\.\2.(20)?(1|2))\.(?:lccs\.xz|lkks|tar\.gz)/ ) {
-		
+		my $target_dir = "$ftp_root/$2/" . 20 . "$1" . "/";
+		if ( $File::Find::dir -eq $ftp_root ) {
+			say LOGFILE "File $_ with ICAO $2 was send to root ftp directory" ;
+		} elsif ( $File::Find::dir -eq $target_dir) {
+			return;
+		}
+		unless ( -d $target_dir ) {
+			make_path ( $target_dir );
+			say LOGFILE "Create dir $target_dir for data file $_" ;
+		}
+		move ("$File::Find::name", "$target_dir");
+	} else
 }
 
 close LOGFILE;
