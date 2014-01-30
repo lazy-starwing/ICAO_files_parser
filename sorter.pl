@@ -36,8 +36,7 @@ sub dig {
 			say LOGFILE "Файл $File::Find::name перенесен в корень FTP" ;
 		}
 		if ( -d $_ && $Find::Find::dir =~ m/$ftp_root\/([A-Z]{4}|CCC)\/.*/ ) {
-			# Проверить, что папка пуста
-				# Удалить папку
+			rmdir;
 		}
 	}
 
