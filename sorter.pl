@@ -18,7 +18,7 @@ open LOGFILE, ">>", $logfile;
 finddepth ( \&dig, $ftp_root );
 
 sub dig {
-	if ( /(?:20)?([0-9][0-9][0-1][0-9][0-3][0-9]\.[0-2][0-9][0-6][0-9][0-6][0-9]\.(?:([A-Z]{4}|CCC)\.(20)?(1|2)\.\w+\.|\w+\.\2.(20)?(1|2))\.(?:lccs\.xz|lkks|tar\.gz$)/ ) {
+	if ( /(?:20)?([0-9][0-9])[0-1][0-9][0-3][0-9]\.[0-2][0-9][0-6][0-9][0-6][0-9]\.(?:([A-Z]{4}|CCC)\.(20)?(1|2)\.\w+\.|\w+\.\2.(20)?(1|2))\.(lccs\.xz$)|(lkks$)|(tar\.gz$)/ ) {
 		my $target_dir = "$ftp_root/$2/" . 20 . "$1" . "/";
 		if ( $File::Find::dir -eq $ftp_root ) {
 			say LOGFILE "File $_ with ICAO $2 was send to root ftp directory" ;
