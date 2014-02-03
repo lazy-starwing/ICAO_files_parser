@@ -21,11 +21,11 @@ close LOGFILE;
 
 sub dig {
 	# Если файл с данными из региона
-	if ( /(?:20)?([0-9][0-9])[0-1][0-9][0-3][0-9]\.[0-2][0-9][0-6][0-9][0-6][0-9]\.(?:\w+\.)?([A-Z]{4}|CCC)\.(?:20)?(?:1|2)\.(?:\w+\.)?(?:(?:lccs\.xz$)|(?:lkks$)|(?:tar\.xz$))/ ) {
-		my $target_dir = "$ftp_root/$2/" . 20 . "$1" . "/";
+	if ( /(?:20)?([0-9][0-9])([0-1][0-9])[0-3][0-9]\.[0-2][0-9][0-6][0-9][0-6][0-9]\.(?:\w+\.)?([A-Z]{4}|CCC)\.(?:20)?(?:1|2)\.(?:\w+\.)?(?:(?:lccs\.xz$)|(?:lkks$)|(?:tar\.xz$))/ ) {
+		my $target_dir = "$ftp_root/$3/" . 20 . "$1" . "/" . "$2" . "/";
 		# Если файл с данными лежит в корне ftp
 		if ( $File::Find::dir eq $ftp_root ) {
-			say LOGFILE "File $Find::File::name with ICAO $2 and year $1 was send to root ftp directory" ;
+			say LOGFILE "File $Find::File::name with ICAO $3, year $1 and month $2 was send to root ftp directory" ;
 		# Проверка, что файл уже в нужном каталоге
 		} elsif ( $File::Find::dir . "/" eq $target_dir) {
 			return;
